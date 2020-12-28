@@ -33,9 +33,9 @@ class point(object):
     def __init__(self, x, y):
         self.x = x
         self.y = y
-
-        self.prev = None
-        self.next = None
+        
+        self.prev = []
+        self.next = []
 class shape(object):
     def __init__(self, Point1, Point2):
         self.p1 = Point1
@@ -65,16 +65,29 @@ class Graph(object):
         self.points.clear()
         self.shapes.clear()
     def setPrev(self, p1, p2):
-        p1.prev = p2
+        p1.prev.append(p2)
         self.addShape(shape(p2,p1))
     def setNext(self, p1, p2):
-        p1.next = p2
+        p1.next.append(p2)
         self.addShape(shape(p2,p1))
     def checkAv(self, p1, p2):
         for i in self.shapes:
             if intersect(p1,p2,i.p1,i.p2):
                 return False
         return True
+    def iterationOfNext(self, mas, el):
+        for j in mas:
+            if self.checkAv(j, el):
+                self.setNext(el,j)
+            self.iterationOfNext(j.next, el)
+    def iterationOfPrev(self, mas, el):
+        for j in mas:
+            if self.checkAv(j, el):
+                if len(el.next) == 0:
+                    self.setNext(el,j)
+                else:
+                    self.setPrev(el,j)
+            self.iterationOfPrev(j.prev, el)
     def createTriang(self):
         self.points.sort(key = lambda point: point.x)
         po = self.points
@@ -82,27 +95,15 @@ class Graph(object):
         if len(self.points) == 2:
             self.shapes.append(self.points[0], self.points[1])
         elif len(self.points) > 2:
-            self.setPrev(po[2],po[0])
-            self.setNext(po[2],po[1])
+            self.setPrev(po[2],po[1])
+            self.setNext(po[2],po[0])
             self.setNext(po[1],po[0])
             lastAdd = po[2]
 
             for i in range(3, len(po)):
                 self.setPrev(po[i], lastAdd)
-                pr = lastAdd.prev
-                nt = lastAdd.next
-                while nt and nt != po[0] and self.checkAv(nt, po[i]):
-                    #a = po[i].next
-                    #po[i].prev = a
-
-                    self.setNext(po[i],nt)
-                    nt = nt.next
-                while pr and self.checkAv(pr, po[i]):
-                    if po[i].next is None:
-                        a = po[i].prev
-                        po[i].next = a
-                    self.setPrev(po[i],pr)
-                    pr = pr.prev
+                self.iterationOfNext(lastAdd.next, po[i])
+                self.iterationOfPrev(lastAdd.prev, po[i])
                 lastAdd = po[i]
                     
 
@@ -141,6 +142,7 @@ class form1(System.Windows.Forms.Form):
         self.addPB = WinForm.Button()
         self.addPXTB = WinForm.TextBox()
         self.addPYTB = WinForm.TextBox()
+        self.baton = WinForm.Button()
 
         self.ImagePB.Location = Dr.Point(10, 10)
         self.ImagePB.Size = Dr.Size(1300, 700)
@@ -187,7 +189,16 @@ class form1(System.Windows.Forms.Form):
         self.randomizePointsB.UseVisualStyleBackColor = 0
         self.randomizePointsB.FlatStyle = WinForm.FlatStyle.Flat
         self.randomizePointsB.FlatAppearance.BorderSize = 0
-        self.randomizePointsB.Click += self.randomizePointsB_Click    
+        self.randomizePointsB.Click += self.randomizePointsB_Click   
+
+        self.baton.Location = Dr.Point(420, 780)
+        self.baton.Size = Dr.Size(200, 50)
+        self.baton.BackColor = Dr.Color.FromArgb(238,238,240)
+        self.baton.Text = "baton"
+        self.baton.UseVisualStyleBackColor = 0
+        self.baton.FlatStyle = WinForm.FlatStyle.Flat
+        self.baton.FlatAppearance.BorderSize = 0
+        self.baton.Click += self.baton_Click   
 
         self.PointsCountTB.Location = Dr.Point(645, 720)
         self.PointsCountTB.Size = Dr.Size(200, 50)
@@ -201,6 +212,7 @@ class form1(System.Windows.Forms.Form):
         self.Controls.Add(self.addPB)
         self.Controls.Add(self.addPXTB)
         self.Controls.Add(self.addPYTB)
+        self.Controls.Add(self.baton)
     def dispose(self):
         self.components.Dispose()
         WinForm.Form.Dispose(self)
@@ -251,7 +263,10 @@ class form1(System.Windows.Forms.Form):
     def butt_Click(self, sender, args):
         self.ImagePB.Image = None
         self.graph.clear()
-        
+    def baton_Click(self, sender, args):
+        a = [point(81,610),point(155,586),point(468,190),point(534,438),point(568,490),point(617,244),point(690,568), point(703,466), point(775, 68)]
+        for i in a:
+             self.graph.addPoint(i)
 
 def form_thr():
     form = form1()

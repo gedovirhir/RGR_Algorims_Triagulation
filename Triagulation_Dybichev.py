@@ -34,8 +34,8 @@ class point(object):
         self.x = x
         self.y = y
         
-        self.prev = []
-        self.next = []
+        self.prev = None
+        self.next = None
 class shape(object):
     def __init__(self, Point1, Point2):
         self.p1 = Point1
@@ -65,29 +65,26 @@ class Graph(object):
         self.points.clear()
         self.shapes.clear()
     def setPrev(self, p1, p2):
-        p1.prev.append(p2)
+        p1.prev = p2
         self.addShape(shape(p2,p1))
     def setNext(self, p1, p2):
-        p1.next.append(p2)
+        p1.next = p2
         self.addShape(shape(p2,p1))
     def checkAv(self, p1, p2):
         for i in self.shapes:
             if intersect(p1,p2,i.p1,i.p2):
                 return False
         return True
-    def iterationOfNext(self, mas, el):
-        for j in mas:
-            if self.checkAv(j, el):
-                self.setNext(el,j)
-            self.iterationOfNext(j.next, el)
-    def iterationOfPrev(self, mas, el):
-        for j in mas:
-            if self.checkAv(j, el):
-                if len(el.next) == 0:
-                    self.setNext(el,j)
-                else:
-                    self.setPrev(el,j)
-            self.iterationOfPrev(j.prev, el)
+    def iterationOfNext(self,j, el):
+        nt = j.next
+        if nt and self.checkAv(nt, el):
+            self.setNext(el,nt)
+            self.iterationOfNext(nt, el)
+    def iterationOfPrev(self, j, el):
+        nt = j.prev
+        if nt and self.checkAv(nt, el):
+            self.setPrev(el, nt)
+            self.iterationOfPrev(nt, el)
     def createTriang(self):
         self.points.sort(key = lambda point: point.x)
         po = self.points
@@ -95,15 +92,31 @@ class Graph(object):
         if len(self.points) == 2:
             self.shapes.append(self.points[0], self.points[1])
         elif len(self.points) > 2:
-            self.setPrev(po[2],po[1])
-            self.setNext(po[2],po[0])
-            self.setNext(po[1],po[0])
+            if po[1].y - po[2].y > 0:
+                self.setNext(po[2],po[1])
+                if po[0].y - po[1].y > 0:
+                    self.setNext(po[1], po[0])
+                    self.addShape(shape(po[2],po[0]))
+                else:
+                    self.setPrev(po[2], po[0])
+                    self.addShape(shape(po[1],po[0]))
+            else:
+                self.setPrev(po[2], po[1])
+                if po[0].y - po[1].y < 0:
+                    self.setPrev(po[1], po[0])
+                    self.addShape(shape(po[2],po[0]))
+                else:
+                    self.setNext(po[2], po[0])
+                    self.addShape(shape(po[1],po[0]))
             lastAdd = po[2]
 
             for i in range(3, len(po)):
-                self.setPrev(po[i], lastAdd)
-                self.iterationOfNext(lastAdd.next, po[i])
-                self.iterationOfPrev(lastAdd.prev, po[i])
+                if lastAdd.y - po[i].y < 0:
+                    self.setPrev(po[i], lastAdd)
+                else:
+                    self.setNext(po[i], lastAdd)
+                self.iterationOfNext(lastAdd, po[i])
+                self.iterationOfPrev(lastAdd, po[i])
                 lastAdd = po[i]
                     
 
@@ -146,6 +159,7 @@ class form1(System.Windows.Forms.Form):
         self.Ylabel = WinForm.Label()
         self.info = WinForm.Label()
         self.info2 = WinForm.Label()
+        self.baton = WinForm.Button()
 
         self.ImagePB.Location = Dr.Point(10, 10)
         self.ImagePB.Size = Dr.Size(1300, 700)
@@ -194,6 +208,15 @@ class form1(System.Windows.Forms.Form):
         self.randomizePointsB.FlatAppearance.BorderSize = 0
         self.randomizePointsB.Click += self.randomizePointsB_Click   
 
+        self.baton.Location = Dr.Point(420, 780)
+        self.baton.Size = Dr.Size(200, 50)
+        self.baton.BackColor = Dr.Color.FromArgb(238,238,240)
+        self.baton.Text = "baton"
+        self.baton.UseVisualStyleBackColor = 0
+        self.baton.FlatStyle = WinForm.FlatStyle.Flat
+        self.baton.FlatAppearance.BorderSize = 0
+        self.baton.Click += self.baton_Click
+
         self.PointsCountTB.Location = Dr.Point(645, 735)
         self.PointsCountTB.Size = Dr.Size(200, 50)
         self.PointsCountTB.Text = "20"
@@ -226,6 +249,7 @@ class form1(System.Windows.Forms.Form):
         self.Controls.Add(self.Ylabel)
         self.Controls.Add(self.info)
         self.Controls.Add(self.info2)
+        self.Controls.Add(self.baton)
     def dispose(self):
         self.components.Dispose()
         WinForm.Form.Dispose(self)
@@ -233,29 +257,6 @@ class form1(System.Windows.Forms.Form):
     def ImagePB_MouseDown(self, sender, args):
         if args.Button == WinForm.MouseButtons.Right:
             self.graph.addPoint(point(args.X,args.Y))
-        """
-        elif args.Button == WinForm.MouseButtons.Left:
-            if self.versh == -1:
-                for i in range(self.n):
-                    if (args.X<self.koortoch[i].X+10 and args.X>self.koortoch[i].X-10 and args.Y<self.koortoch[i].Y+10 and args.Y>self.koortoch[i].Y-10):
-                        self.versh = i 
-                        break
-            else:
-                toversh = -1
-                for i in range(self.n):
-                     if (args.X<self.koortoch[i].X+10 and args.X>self.koortoch[i].X-10 and args.Y<self.koortoch[i].Y+10 and args.Y>self.koortoch[i].Y-10):
-                         toversh = i
-                         break
-                if (toversh != -1) and (self.versh != toversh):
-                    drawPen.Width = 2
-                    
-                    flagGraphics.DrawLine(drawPen, self.koortoch[self.versh], self.koortoch[toversh])
-                    self.DataGrid.Rows[self.versh].Cells[toversh].Value = 1
-                    self.DataGrid.Rows[toversh].Cells[self.versh].Value = 1
-                    self.versh = -1 
-
-                    self.ImagePB.Image = self.canvas
-            """
     def drawObjects(self, sender, args):
         self.ImagePB.Image = None
         self.canvas = Dr.Bitmap(self.ImagePB.Width, self.ImagePB.Height)
@@ -277,7 +278,7 @@ class form1(System.Windows.Forms.Form):
         self.ImagePB.Image = None
         self.graph.clear()
     def baton_Click(self, sender, args):
-        a = [point(81,610),point(155,586),point(468,190),point(534,438),point(568,490),point(617,244),point(690,568), point(703,466), point(775, 68)]
+        a = [point(39,107),point(104,103),point(193,97),point(222,263),point(253,53),point(276,102),point(291,571)]
         for i in a:
              self.graph.addPoint(i)
 

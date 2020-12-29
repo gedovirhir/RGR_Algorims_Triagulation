@@ -142,7 +142,10 @@ class form1(System.Windows.Forms.Form):
         self.addPB = WinForm.Button()
         self.addPXTB = WinForm.TextBox()
         self.addPYTB = WinForm.TextBox()
-        self.baton = WinForm.Button()
+        self.Xlabel = WinForm.Label()
+        self.Ylabel = WinForm.Label()
+        self.info = WinForm.Label()
+        self.info2 = WinForm.Label()
 
         self.ImagePB.Location = Dr.Point(10, 10)
         self.ImagePB.Size = Dr.Size(1300, 700)
@@ -161,16 +164,16 @@ class form1(System.Windows.Forms.Form):
         self.addPB.Location = Dr.Point(10, 770)
         self.addPB.Size = Dr.Size(200, 50)
         self.addPB.BackColor = Dr.Color.FromArgb(238,238,240)
-        self.addPB.Text = "Добавить: X Y"
+        self.addPB.Text = "Добавить точку"
         self.addPB.UseVisualStyleBackColor = 0
         self.addPB.FlatStyle = WinForm.FlatStyle.Flat
         self.addPB.FlatAppearance.BorderSize = 0  
         self.addPB.Click += self.addPB_Click 
 
-        self.addPXTB.Location = Dr.Point(220, 770)
+        self.addPXTB.Location = Dr.Point(250, 770)
         self.addPXTB.Size = Dr.Size(50, 20)
 
-        self.addPYTB.Location = Dr.Point(220, 800)
+        self.addPYTB.Location = Dr.Point(250, 800)
         self.addPYTB.Size = Dr.Size(50, 20)
         
         self.TriangB.Location = Dr.Point(220, 720)
@@ -191,19 +194,26 @@ class form1(System.Windows.Forms.Form):
         self.randomizePointsB.FlatAppearance.BorderSize = 0
         self.randomizePointsB.Click += self.randomizePointsB_Click   
 
-        self.baton.Location = Dr.Point(420, 780)
-        self.baton.Size = Dr.Size(200, 50)
-        self.baton.BackColor = Dr.Color.FromArgb(238,238,240)
-        self.baton.Text = "baton"
-        self.baton.UseVisualStyleBackColor = 0
-        self.baton.FlatStyle = WinForm.FlatStyle.Flat
-        self.baton.FlatAppearance.BorderSize = 0
-        self.baton.Click += self.baton_Click   
-
-        self.PointsCountTB.Location = Dr.Point(645, 720)
+        self.PointsCountTB.Location = Dr.Point(645, 735)
         self.PointsCountTB.Size = Dr.Size(200, 50)
         self.PointsCountTB.Text = "20"
+
+        self.Xlabel.Location = Dr.Point(220, 770)
+        self.Xlabel.Size = Dr.Size(20,20)
+        self.Xlabel.Text = "X"
+
+        self.Ylabel.Location = Dr.Point(220, 800)
+        self.Ylabel.Size = Dr.Size(20,20)
+        self.Ylabel.Text = "Y"
         
+        self.info.Location = Dr.Point(1320, 10)
+        self.info.Size = Dr.Size(200,20)
+        self.info.Text = "Выполнил: Дыбичев Н.Л. ПРО-222"
+
+        self.info2.Location = Dr.Point(1320, 50)
+        self.info2.Size = Dr.Size(500,100)
+        self.info2.Text = "Задание:На плоскости заданы N точек. \nСоединить их непересекающимися отрезками таким образом, чтобы каждая область внутри выпуклой оболочки этого \nмножества точек являлась треугольником (Триангуляция). \nРазработать алгоритм решения этой задачи и написать программу."
+
         self.Controls.Add(self.ImagePB)
         self.Controls.Add(self.butt)
         self.Controls.Add(self.TriangB)
@@ -212,7 +222,10 @@ class form1(System.Windows.Forms.Form):
         self.Controls.Add(self.addPB)
         self.Controls.Add(self.addPXTB)
         self.Controls.Add(self.addPYTB)
-        self.Controls.Add(self.baton)
+        self.Controls.Add(self.Xlabel)
+        self.Controls.Add(self.Ylabel)
+        self.Controls.Add(self.info)
+        self.Controls.Add(self.info2)
     def dispose(self):
         self.components.Dispose()
         WinForm.Form.Dispose(self)

@@ -29,6 +29,13 @@ def intersect(a,b,c,d):
     if ((a.x == c.x and a.y == c.y) or (a.x == d.x and a.y == d.y)) != ((b.x == c.x and b.y == c.y) or (b.x == d.x and b.y == d.y)):
         return False
     return intersect_1(a.x, b.x, c.x, d.x) and intersect_1(a.y, b.y, c.y, d.y) and area(a,b,c) * area(a,b,d) <= 0 and area(c,d,a) * area(c,d,b) <= 0
+def checkVector(x1,y1,x2,y2):
+    if (x1 * y2 - y1 * x2) > 0:
+        return 1
+    elif (x1 * y2 - y1 * x2) < 0:
+        return -1
+    else:
+        return 0
 class point(object):
     def __init__(self, x, y):
         self.x = x
@@ -77,38 +84,37 @@ class Graph(object):
         return True
     def iterationOfNext(self,j, el):
         nt = j.next
-        if nt and self.checkAv(nt, el):
+        if nt and (checkVector(nt.x - el.x, nt.y - el.y, nt.x - j.x, nt.y - j.y) == -1 or checkVector(nt.x - el.x, nt.y - el.y, nt.x - j.x, nt.y - j.y) == 0) and self.checkAv(nt, el):
             self.setNext(el,nt)
+            if el.prev is None:
+                el.prev = j
             self.iterationOfNext(nt, el)
     def iterationOfPrev(self, j, el):
         nt = j.prev
-        if nt and self.checkAv(nt, el):
+        if nt and (checkVector(nt.x - el.x, nt.y - el.y, nt.x - j.x, nt.y - j.y) == 1 or checkVector(nt.x - el.x, nt.y - el.y, nt.x - j.x, nt.y - j.y) == 0) and self.checkAv(nt, el):
             self.setPrev(el, nt)
+            if el.next is None:
+                el.next = j
             self.iterationOfPrev(nt, el)
     def createTriang(self):
         self.points.sort(key = lambda point: point.x)
         po = self.points
         lastAdd = self.points[0]
         if len(self.points) == 2:
-            self.shapes.append(self.points[0], self.points[1])
+            self.setNext(po[0],po[1])
         elif len(self.points) > 2:
-            if po[1].y - po[2].y > 0:
-                self.setNext(po[2],po[1])
-                if po[0].y - po[1].y > 0:
-                    self.setNext(po[1], po[0])
-                    self.addShape(shape(po[2],po[0]))
-                else:
-                    self.setPrev(po[2], po[0])
-                    self.addShape(shape(po[1],po[0]))
+            if (checkVector(po[1].x - po[2].x, po[1].y - po[2].y, po[0].x - po[2].x, po[0].y - po[2].y) == 1) or (checkVector(po[1].x - po[2].x, po[1].y - po[2].y, po[0].x - po[2].x, po[0].y - po[2].y) == 0):
+                self.setNext(po[2], po[1]) 
+                self.setPrev(po[2],po[0])
+                self.setNext(po[1],po[0])
+                po[0].prev = po[1]
             else:
-                self.setPrev(po[2], po[1])
-                if po[0].y - po[1].y < 0:
-                    self.setPrev(po[1], po[0])
-                    self.addShape(shape(po[2],po[0]))
-                else:
-                    self.setNext(po[2], po[0])
-                    self.addShape(shape(po[1],po[0]))
+                self.setNext(po[2], po[0]) 
+                self.setPrev(po[2],po[1])
+                self.setNext(po[0],po[1])
+                po[1].prev = po[0]
             lastAdd = po[2]
+            
 
             for i in range(3, len(po)):
                 if lastAdd.y - po[i].y < 0:
@@ -278,7 +284,7 @@ class form1(System.Windows.Forms.Form):
         self.ImagePB.Image = None
         self.graph.clear()
     def baton_Click(self, sender, args):
-        a = [point(39,107),point(104,103),point(193,97),point(222,263),point(253,53),point(276,102),point(291,571)]
+        a = [point(200,100),point(300,100),point(400,100),point(532,38), point(532,238)]
         for i in a:
              self.graph.addPoint(i)
 

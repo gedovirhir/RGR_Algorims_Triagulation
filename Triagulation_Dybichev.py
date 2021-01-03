@@ -165,7 +165,6 @@ class form1(System.Windows.Forms.Form):
         self.Ylabel = WinForm.Label()
         self.info = WinForm.Label()
         self.info2 = WinForm.Label()
-        self.baton = WinForm.Button()
 
         self.ImagePB.Location = Dr.Point(10, 10)
         self.ImagePB.Size = Dr.Size(1300, 700)
@@ -214,15 +213,6 @@ class form1(System.Windows.Forms.Form):
         self.randomizePointsB.FlatAppearance.BorderSize = 0
         self.randomizePointsB.Click += self.randomizePointsB_Click   
 
-        self.baton.Location = Dr.Point(420, 780)
-        self.baton.Size = Dr.Size(200, 50)
-        self.baton.BackColor = Dr.Color.FromArgb(238,238,240)
-        self.baton.Text = "baton"
-        self.baton.UseVisualStyleBackColor = 0
-        self.baton.FlatStyle = WinForm.FlatStyle.Flat
-        self.baton.FlatAppearance.BorderSize = 0
-        self.baton.Click += self.baton_Click
-
         self.PointsCountTB.Location = Dr.Point(645, 735)
         self.PointsCountTB.Size = Dr.Size(200, 50)
         self.PointsCountTB.Text = "20"
@@ -255,7 +245,6 @@ class form1(System.Windows.Forms.Form):
         self.Controls.Add(self.Ylabel)
         self.Controls.Add(self.info)
         self.Controls.Add(self.info2)
-        self.Controls.Add(self.baton)
     def dispose(self):
         self.components.Dispose()
         WinForm.Form.Dispose(self)
@@ -283,10 +272,6 @@ class form1(System.Windows.Forms.Form):
     def butt_Click(self, sender, args):
         self.ImagePB.Image = None
         self.graph.clear()
-    def baton_Click(self, sender, args):
-        a = [point(200,100),point(300,100),point(400,100),point(532,38), point(532,238)]
-        for i in a:
-             self.graph.addPoint(i)
 
 def form_thr():
     form = form1()
